@@ -1,328 +1,132 @@
-/* General Styles and Body Styles */
-       * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-    }
-    
-    body {
-        font-family: Arial, sans-serif;
-            line-height: 1.6;
-            padding: 2vw;
-            background-color: #f4f4f4;
-            background-image: url('./bg pic edit.webp');
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
+
+
+// // Function to add an item to the cart and update the table
+// function addItemToCart(medicineName, price, quantityInputId) {
+//     // Get the quantity from the input field
+//     const quantity = parseInt(document.getElementById(quantityInputId).value);
+  
+//     // Retrieve the current cart data from localStorage
+//     let cart = JSON.parse(localStorage.getItem("cartData")) || [];
+  
+//     // Check if the item already exists in the cart
+//     const existingItemIndex = cart.findIndex(item => item.name === medicineName);
+  
+//     if (existingItemIndex !== -1) {
+//       // Update the quantity of the existing item
+//       cart[existingItemIndex].quantity += quantity;
+//       cart[existingItemIndex].totalPrice = cart[existingItemIndex].price * cart[existingItemIndex].quantity;
+//     } else {
+//       // Add new item to the cart
+//       cart.push({
+//         name: medicineName,
+//         price: price,
+//         quantity: quantity,
+//         totalPrice: price * quantity
+//       });
+//     }
+  
+//     // Save the updated cart in localStorage
+//     localStorage.setItem("cartData", JSON.stringify(cart));
+  
+//     // Update the cart table with the new data
+//     updateCartTable();
+//   }
+  
+//   // Function to update the cart table based on localStorage
+//   function updateCartTable() {
+//     // Get the table body element
+//     const cartTableBody = document.querySelector("#cartTable tbody");
+//     cartTableBody.innerHTML = ""; // Clear the table before appending new rows
+  
+//     // Retrieve cart data from localStorage
+//     const cartData = JSON.parse(localStorage.getItem("cartData")) || [];
+  
+//     // Loop through the cart data and append each item as a new row in the table
+//     cartData.forEach(item => {
+//       const row = document.createElement("tr");
+//       row.innerHTML = `
+//         <td>${item.name}</td>
+//         <td>LKR ${item.price}</td>
+//         <td>${item.quantity}</td>
+//         <td>LKR ${item.totalPrice}</td>
+//       `;
+//       cartTableBody.appendChild(row);
+//     });
+  
+//     // Calculate and display the total price
+//     const totalPrice = cartData.reduce((sum, item) => sum + item.totalPrice, 0);
+//     document.getElementById("totalPrice").textContent = `Total: LKR ${totalPrice.toFixed(2)}`;
+//   }
+  
+//   // Update the table when the page loads
+//   document.addEventListener("DOMContentLoaded", updateCartTable);
+  
+// Array to store cart items
+let cart = JSON.parse(localStorage.getItem('cart')) || [];
+// Retrieve favorites data from localStorage or initialize empty array
+let favorites = JSON.parse(localStorage.getItem('favorites')) || [];
+
+// Function to scroll to the cart section
+function scrollToCart() {
+    const cartSection = document.getElementById('cart-section');
+    cartSection.scrollIntoView({ behavior: 'smooth' }); 
+}
+
+
+// Add items to cart
+function addToCart(name, price, qtyId) {
+    const quantity = parseInt(document.getElementById(qtyId).value);
+    if (quantity > 0) {
+        // Check if the item already exists in the cart
+        const existingItem = cart.find(item => item.name === name);
+        if (existingItem) {
+            existingItem.quantity += quantity;
+        } else {
+            cart.push({ name, price, quantity });
         }
 
-        .container {
-            max-width: 100%;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: rgb(57, 165, 236);
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            width: 100%;
-        }
+    
+        localStorage.setItem('cart', JSON.stringify(cart));
 
-        h1 {
-            text-align: center;
-            margin-bottom: 20px;
-        }
+        // Update the cart display
+        displayCart();
 
-        .medicine-section {
-            margin-bottom: 20px;
-        }
+        alert(`${name} added to the cart.`);
+    } else {
+        alert("Please enter a valid quantity.");
+    }
+}
+function displayCart() {
+    const cartTableBody = document.querySelector('#cart-table tbody');
+    const cartTotal = document.getElementById('cart-total');
+    let total = 0;
 
-        .medicine-section h2 {
-            margin-bottom: 10px;
-        }
+    // Clear existing cart table rows
+    cartTableBody.innerHTML = '';
 
-        .medicine-list {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
+ 
+    cart.forEach((item, index) => {
+        const row = document.createElement('tr');
+        const itemTotal = item.price * item.quantity;
+        total += itemTotal;
 
-        .medicine-item {
-            background: #fff;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            width: calc(33.33% - 20px);
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
+        row.innerHTML = `
+            <td>${item.name}</td>
+            <td>LKR ${item.price}</td>
+            <td>${item.quantity}</td>
+            <td>LKR ${itemTotal.toFixed(2)}</td>
+            <td><button onclick="removeItem(${index})">Remove</button></td>
+        `;
 
-        .medicine-item label {
-            display: block;
-            margin-bottom: 5px;
-        }
+        cartTableBody.appendChild(row);
+    });
 
-        .medicine-item input {
-            width: 100%;
-            padding: 5px;
-            margin-top: 5px;
-        }
 
-        .btn {
-            display: block;
-            width: 100%;
-            padding: 10px;
-            background: #28a745;
-            color: white;
-            text-align: center;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-top: 10px;
-        }
-
-        .btn:hover {
-            background: #218838;
-        }
-
-        .order-summary {
-            margin-top: 20px;
-            padding: 20px;
-            background: #fff;
-            border-radius: 5px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
-
-        .order-summary table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        .order-summary table th,
-        .order-summary table td {
-            border: 1px solid #ddd;
-            padding: 10px;
-            text-align: left;
-        }
-
-        .order-summary table th {
-            background: #f4f4f4;
-        }
-
-        .order-summary .total {
-            font-weight: bold;
-            text-align: right;
-        }
-        font-family: Arial, sans-serif;
-    
-    
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-    }
-    
-    body {
-        font-family: Arial, sans-serif;
-        background-color:rgb(217, 245, 253);
-    }
-    
-    header {
-        width: 100%;
-        border-bottom: 2px solid #0e0e0e;
-    }
-    
-    .top-bar {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 10px;
-        background-color: lightskyblue;
-    }
-    
-    .logo img {
-        margin-left: 100px;
-        height: 100px;
-        width: 100px;
-    }
-    .logo h1{
-        margin-bottom:20px;
-        text-align: center;
-    }
-    
-    .contact-info {
-        display: flex;
-        gap: 20px;
-    }
-    
-    .contact-info div {
-        display: flex;
-        align-items: center;
-    }
-    
-    .contact-info img {
-        height: 20px;
-        margin-right: 5px;
-    }
-    
-    .search-social {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-    
-    .search-social input {
-        padding: 5px;
-    }
-    
-    .search-social button {
-        padding: 5px 10px;
-    }
-    
-    .social-icons img {
-        height: 20px;
-        margin-left: 10px;
-    }
-    
-    .main-nav {
-        display: flex;
-        justify-content: space-around;
-        background-color:rgb(5, 5, 48);
-        padding: 10px;
-    }
-    
-    .main-nav a {
-        text-align: end;
-        padding: 10px 20px;
-        color:rgb(246, 245, 245);
-        font-weight: bold;
-        border-radius: 5px;
-        font-size: large;
-    }
-    
-    .main-heading {
-        text-align: center;
-        padding: 40px 0;
-        background-color: #ddd;
-    }
-    
-    .main-heading h1 {
-        font-size: 36px;
-        color: #333;
-    }
-    
-    .services-section {
-        text-align: center;
-        padding: 40px 0;
-    }
-    
-    .services-section h2 {
-        font-size: 28px;
-        color: #333;
-        margin-bottom: 20px;
-    }
-    
-    .services-grid {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 20px;
-        padding: 20px;
-    }
-    
-    .service-block {
-        border: 1px solid #ccc;
-        padding: 10px;
-    }
-    
-    .image-placeholder {
-        width: 150%;
-        height: 150px;
-        background-color: #ddd;
-    }
-    
-    .doctors {
-        padding: 20px;
-        text-align: center;
-    }
-    
-    .doctors h2 {
-        margin-bottom: 20px;
-        font-size: 24px;
-    }
-    
-    .doctor-grid {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr); 
-        gap: 20px;
-        padding: 0 20px;
-    }
-    
-    .doctor-card {
-        text-align: center;
-        background-color: #a2d7f2;
-        padding: 15px;
-        border: 3px solid #080808;
-        border-radius: 8px;
-    }
-    
-    .doctor-card img {
-        width: 100%;
-        height: auto;
-        max-width: 150px; 
-        height: 150px;
-        object-fit: cover; 
-        border-radius: 0; 
-    }
-    
-    .text-placeholder p {
-        margin: 10px 0;
-        color: #555;
-    }
-    
-    
-    
-    /* Footer Styles */
-    footer {
-        background-color: #585656;
-        padding: 20px;
-        border-top: 3px solid #ccc;
-    }
-    
-    .footer-container {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        flex-wrap: wrap;
-    }
-    
-    .footer-logo, .footer-social, .footer-address, .footer-contact {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        flex: 1;
-        text-align: center;
-        padding: 10px;
-    }
-    
-    .footer-logo img {
-        width: 80px;
-        height: 80px;
-    }
-    
-    .footer-social span {
-        margin: 0 10px;
-    }
-    
-    .footer-social img {
-        width: 30px;
-        height: 30px;
-    }
-    
-    .footer-address p, .footer-contact p {
-        margin: 5px 0;
-        font-size: 14px;
-    }
-    
-    .footer-contact img {
-        width: 16px;
-        height: 16px;
-        margin-right: 5px;
-        vertical-align: middle;
-    }
+    cartTotal.textContent = `LKR ${total.toFixed(2)}`;
+}
+// Remove an item from the cart
+function removeItem(index) {
+    cart.splice(index, 1); 
+    localStorage.setItem('cart', JSON.stringify(cart)); // Update localStorage
+    displayCart(); // Re-render the cart table
+}
